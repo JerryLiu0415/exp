@@ -901,7 +901,7 @@ game_core.prototype.client_create_configuration = function() {
     this.fake_lag = 0;                //If we are simulating lag, this applies only to the input client (not others)
     this.fake_lag_time = 0;
 
-    this.net_offset = 100;              //100 ms latency between server and client interpolation for other clients
+    this.net_offset = 1;                //100 ms latency between server and client interpolation for other clients
     this.buffer_size = 2;               //The size of the server history to keep for rewinding/interpolating.
     this.target_time = 0.01;            //the time where we want to be in the server timeline
     this.oldest_tick = 0.01;            //the last time tick we have available in the buffer
