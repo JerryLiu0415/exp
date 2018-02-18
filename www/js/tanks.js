@@ -1,5 +1,5 @@
 var DEBUG = true;
-var INTERVAL = 50;
+var INTERVAL = 20;
 var ROTATION_SPEED = 5;
 var ARENA_MARGIN = 30;
 
