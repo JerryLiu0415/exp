@@ -2,7 +2,8 @@ var WIDTH = 1100;
 var HEIGHT = 580;
 // This IP is hardcoded to my server, replace with your own
 // 'https://oooppp.herokuapp.com'
-var socket = io.connect('http://localhost:5003');
+// 'http://localhost:5003'
+var socket = io.connect('https://oooppp.herokuapp.com');
 var game = new Game('#arena', WIDTH, HEIGHT, socket);
 var selectedTank = 1;
 var tankName = '';
