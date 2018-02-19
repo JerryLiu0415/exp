@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var PhysicsBody = require('./phyBody.js');
 var counter = 0;
 var BALL_SPEED = 10;
 var WIDTH = 1100;
@@ -9,7 +10,7 @@ var TANK_INIT_HP = 100;
 //Static resources server
 app.use(express.static(__dirname + '/www'));
 
-var server = app.listen(process.env.PORT || 5000, function () {
+var server = app.listen(process.env.PORT || 5003, function () {
 	var port = server.address().port;
 	console.log('Server running at port %s', port);
 });
@@ -125,6 +126,7 @@ function guid() {
 }
 
 var game = new GameServer();
+const a = new PhysicsBody();
 
 /* Connection events */
 

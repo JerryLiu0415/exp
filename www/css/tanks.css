@@ -22,10 +22,28 @@ body{
 	pointer-events: none;
 }
 
+
+
+.heading{
+    opacity: 1;
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	-webkit-border-radius: 10px;
+	   -moz-border-radius: 5px;
+		 -o-border-radius: 5px;
+			border-radius: 5px;	
+	background-color: #53ff04;
+}
+
 .tank{
 	position: absolute;
 	background-repeat: no-repeat;
-	background-position: -10px 0;
+	background-position: center;
+}
+
+.round{
+	border-radius: 50%;
 }
 
 .explosion{
@@ -109,11 +127,17 @@ body{
 	display: inline-block;
 }
 
+.hp-boarder{
+	width: 106px;
+	height: 13px;
+	margin: 0 auto;
+	border-style: solid;
+}
 .hp-bar{
 	width: 100px;
-	height: 4px;
+	height: 8px;
 	background-color: #7DD12C;
-	margin: 0 auto;
+	margin: left;
 }
 
 .fade{
@@ -156,13 +180,19 @@ body{
 
 /* skins */
 .tank1{
-	background-image: url(../img/tank-1-base.png);
+	background-image: url(../img/testbase.png);
 }
 
 .tank2{
-	background-image: url(../img/tank-2-base.png);
+	background-image: url(../img/testbase.png);
 }
 
 .tank3{
-	background-image: url(../img/tank-3-base.png);
+	background-image: url(../img/testbase.png);
+}
+
+#canvas {
+	top: 100;
+	left: 1000;
+	background-color: #dddddd;
 }
