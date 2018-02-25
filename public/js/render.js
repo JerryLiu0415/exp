@@ -7,6 +7,7 @@ class Render {
         this.$arena = $(arenaId);
         this.$arena.css('width', 1100);
         this.$arena.css('height', 580);
+        this.$chat = $('#chat-history');
         this.roomId = roomId;
         this.playerId = playerId;
         this.donut_renders = {};

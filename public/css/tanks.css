@@ -2,7 +2,7 @@ body{
 	background-color: rgb(133, 133, 133);
 	font-family: Helvetica Neue, Arial;
 	overflow: hidden;
-	background-image: url("css/bodyImg.png");
+	background-image: url("body.png");
 }
 
 .name-prompt{
@@ -15,11 +15,14 @@ body{
 	background-color: #eee;
 	z-index: 2;
 	padding: 10px;
+	stroke-width: 5px;
+	border-style: solid;
+    border-radius: 10px;
 }
 
 .arena{
 	top: 100px;
-	left: 200px;
+	left: 50px;
 	background-color: white;
 	position: absolute;
 	pointer-events: none;
@@ -39,9 +42,28 @@ body{
     margin-right: auto;
 	background-color: rgb(214, 214, 214);
 	position: absolute;
-	pointer-events: none;
 	width: 300px;
-	height: 500px;
+	height: 600px;
+	opacity: 0.5;
+	z-index: 2;
+}
+
+.chat-history {
+	overflow-y: auto;
+	width: 300px;
+	height: 580px;
+}
+
+.chat-input{
+	top: 580px;
+	position: absolute;
+}
+
+.chat-bubble{
+	padding: 5px;
+	position: relative;
+	pointer-events: none;
+	display: block;
 }
 
 .room-id {

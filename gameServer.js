@@ -8,6 +8,7 @@ class GameServer {
         this.gameId = id;
         this.playerCount = 0;
         this.host = host;
+        this.messages = [];
         this.donuts = {};
 
     }
@@ -52,6 +53,10 @@ class GameServer {
         this.phys.applyAngularForce(pid, alpha);
     }
 
+    appendMessage(msg) {
+        this.messages.push(msg);
+    }
+
     applyGameRules() {
 
     }
@@ -59,7 +64,8 @@ class GameServer {
     prepareClientPacketData() {
         var data = {
             gameId: this.gameId,
-            donuts: this.donuts
+            donuts: this.donuts,
+            messages: this.messages
         }
         return data;
     }

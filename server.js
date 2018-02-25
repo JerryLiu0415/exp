@@ -20,7 +20,7 @@ var server = app.listen(process.env.PORT || 5004, function () {
 });
 
 var io = require('socket.io')(server);
-var clientData = {};
+var clients = {};
 
 // All instances of games stored here
 var games = {};
@@ -39,12 +39,14 @@ io.on('connection', function (client) {
 			console.log('Creating new room...');
 			gameId = UID();
 			games[gameId] = new GameServer(gameId, pid);
+			clients[gameId] = [];
 			gameCount++;
 		}
 		let initX = 0;//getRandomInt(40, 900);
 		let initY = 0;//getRandomInt(40, 500);
 		let game = games[gameId];
 		game.addDonut(initX, initY, data.name, data.type, pid);
+		clients[gameId].push(client);
 		client.emit('joined', { roomId: game.gameId, donutId: pid });
 		console.log("User with id " + pid + " has successfully joined room " + game.gameId);
 	});
@@ -63,6 +65,18 @@ io.on('connection', function (client) {
 			return;
 		}
 		client_game.rotate(data.pid, data.alpha);
+	});
+
+	client.on('message', function (data) {
+		var client_game = games[data.rid];
+		if (client_game == null) {
+			return;
+		}
+		var time = new Date();
+		var timeStamp = time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
+		client_game.appendMessage('(' + timeStamp + ') ' + data.pname + ": " + data.content);
+		clients[data.rid].forEach(element => {element.emit('message', client_game.messages)});
+
 	});
 
 	client.on('leaveGame', function (data) {
@@ -87,7 +101,7 @@ setInterval(function () {
 		clientGames[key] = games[key].prepareClientPacketData();
 	}
 
-	clientGames["time"] =  new Date().getTime();
+	clientGames["time"] = new Date().getTime();
 
 	// Send global games data to each client (Should not)
 	io.sockets.emit('sync', clientGames);

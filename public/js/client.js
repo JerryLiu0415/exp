@@ -28,10 +28,18 @@ socket.on('joined', function (data) {
 	localRoomId = data.roomId;
 	localPlayerId = data.donutId;
 	render = new Render('#arena', localPlayerId, localRoomId, socket);
+	$('#chat').show();
+});
+
+socket.on('message', function (data) {
+	$('#chat-history').empty();
+	for (var i = data.length - 1; i >= 0; i--) {
+		$('#chat-history').append('<label type="text" class="chat-bubble">' + data[i] + '</label>');
+	}
 });
 
 $(document).ready(function () {
-
+	$('#chat').hide();
 	$(document).on("contextmenu", function (e) {
 		if (e.target.nodeName != "INPUT" && e.target.nodeName != "TEXTAREA")
 			e.preventDefault();
@@ -61,13 +69,26 @@ $(document).ready(function () {
 		config.type = $(this).data('tank');
 	});
 
+	$('#chat-to-send').keyup(function (e) {
+		var msg = $('#chat-to-send').val();
+		var k = e.keyCode || e.which;
+		if (k == 13) {
+			sendMsg(msg);
+		}
+	});
+
 });
 
 $(window).on('beforeunload', function () {
-	socket.emit('leave', {roomId: render.roomId, donutId: render.donutId});
+	socket.emit('leave', { roomId: render.roomId, donutId: render.donutId });
 });
 
 function joinGame(data) {
 	$('#prompt').hide();
 	socket.emit('joinGame', data);
+}
+
+function sendMsg(data) {
+	$(this).val('#chat-to-send');
+	socket.emit('message', { content: data, pname: config.name, rid: localRoomId });
 }
