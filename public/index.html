@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Abstract Battle</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/tanks.css">
+
+</head>
+
+<body>
+	<!--[if lt IE 7]>
+	<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+	<![endif]-->
+
+	<div id="prompt" class="name-prompt">
+		<div>
+			<div class="form-group">
+				<strong for="donut-name">Name:</strong>
+				<input id="donut-name" type="text" class="form-control" placeholder="Player name..." autocomplete="off">
+			</div>
+			<div class="form-group">
+				<strong for="room-id">Room Id:</strong>
+				<input id="room-id" type="text" class="form-control" placeholder="Room to join..." autocomplete="off">
+			</div>
+			<div class="form-group">
+				<span class="input-group-btn">
+					<input id="join" class="btn btn-info btn-sm" type="submit" value="Join the battle">
+				</span>
+			</div>
+
+			<div class="tank-select">
+				<label>Choose your character:</label>
+				<ul class="donut-selection">
+					<li class="selected" data-tank="1">
+						<img src="img/testbase.png">
+					</li>
+					<li data-tank="2">
+						<img src="img/testbase.png">
+					</li>
+					<li data-tank="3">
+						<img src="img/testbase.png">
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div id="arena" class="arena"></div>
+	<div id="arena" class="chat"></div>
+
+
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/socket.io.js"></script>
+	<script type="text/javascript" src="js/render_donut.js"></script>
+	<script type="text/javascript" src="js/render.js"></script>
+	<script type="text/javascript" src="js/client.js"></script>
+
+
+	<script>
+		(function (b, o, i, l, e, r) {
+			b.GoogleAnalyticsObject = l; b[l] || (b[l] =
+				function () { (b[l].q = b[l].q || []).push(arguments) }); b[l].l = +new Date;
+			e = o.createElement(i); r = o.getElementsByTagName(i)[0];
+			e.src = '//www.google-analytics.com/analytics.js';
+			r.parentNode.insertBefore(e, r)
+		}(window, document, 'script', 'ga'));
+		ga('create', 'UA-XXXXX-X'); ga('send', 'pageview');
+	</script>
+</body>
+
+</html>
