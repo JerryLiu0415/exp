@@ -3,14 +3,8 @@ var app = express();
 var PhysicsWorld = require('./physics.js');
 var GameServer = require('./gameServer.js');
 var INTERVAL = 10;
-var connections = 0;
 var gameCount = 0;
 
-var staticData = {
-	1: { HP: 100 },
-	2: { HP: 100 },
-	3: { HP: 100 }
-};
 
 app.use(express.static(__dirname + '/public'));
 
@@ -31,24 +25,36 @@ io.on('connection', function (client) {
 
 	client.on('joinGame', function (data) {
 		console.log('User connected');
-		connections++;
 		// Create a new room
-		var gameId = data.roomId;
+		var rid = data.rid;
 		let pid = UID();
-		if (!(data.roomId in games)) {
+		if (!(data.rid in games)) {
 			console.log('Creating new room...');
-			gameId = UID();
-			games[gameId] = new GameServer(gameId, pid);
-			clients[gameId] = [];
+			rid = UID();
+			games[rid] = new GameServer(rid, pid);
+			clients[rid] = [];
 			gameCount++;
 		}
 		let initX = 0;//getRandomInt(40, 900);
 		let initY = 0;//getRandomInt(40, 500);
-		let game = games[gameId];
+		let game = games[rid];
 		game.addDonut(initX, initY, data.name, data.type, pid);
-		clients[gameId].push(client);
-		client.emit('joined', { roomId: game.gameId, donutId: pid });
-		console.log("User with id " + pid + " has successfully joined room " + game.gameId);
+		clients[rid].push(client);
+		client.emit('joined', { rid: game.rid, pid: pid, initData: game.prepareClientPacketData() });
+		console.log("User with id " + pid + " has successfully joined room " + game.rid);
+	});
+
+	client.on('shootQ', function (data) {
+		var client_game = games[data.rid];
+		if (client_game == null) {
+			return;
+		}
+		var bid = data.pid + '-B-' + UID();
+		client_game.addBullet(data.from.x, data.from.y, data.to.x, data.to.y, 1, bid);
+		if (client_game.donuts[data.pid] == null) {
+			return;
+		}
+		client_game.donuts[data.pid].cdQ = 1;
 	});
 
 	client.on('move', function (data) {
@@ -59,6 +65,11 @@ io.on('connection', function (client) {
 		client_game.move(data.pid, data.dir);
 	});
 
+	/**
+	 *  Client will send the updated body rotation angle to this route
+	 * 
+	 *  Client data structure { pid: ..., rid: ..., alpha: ...}
+	 */
 	client.on('rotate', function (data) {
 		var client_game = games[data.rid];
 		if (client_game == null) {
@@ -67,25 +78,46 @@ io.on('connection', function (client) {
 		client_game.rotate(data.pid, data.alpha);
 	});
 
+	/**
+	 *  Client will send the msg content along with his room number to this route
+	 *  Historical messages for each game (room) are stored at gameServer
+	 * 
+	 *  Client data structure { content: ..., rid: ...}
+	 */
 	client.on('message', function (data) {
 		var client_game = games[data.rid];
 		if (client_game == null) {
 			return;
 		}
-		var time = new Date();
-		var timeStamp = time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
-		client_game.appendMessage('(' + timeStamp + ') ' + data.pname + ": " + data.content);
-		clients[data.rid].forEach(element => {element.emit('message', client_game.messages)});
-
+		client_game.appendMessage(data.content);
+		clients[data.rid].forEach(element => { element.emit('message', client_game.messages) });
 	});
 
-	client.on('leaveGame', function (data) {
-		console.log(data.donutId + ' has left the game');
-		connections--;
-		game = games[data.roomId];
-		game.cleanDonut(data.donutId);
+	/**
+	 *  Client will send the room id and player id to this route upon closing tab
+	 * 
+	 *  Client data structure { rid: ..., pid: ... }
+	 */
+	client.on('leave', function (data) {
+		console.log(data.pid + ' has left the game');
+		var game = games[data.rid];
+		if (game == null) {
+			return;
+		}
+		// Remove player from gameServer data
+		game.cleanDonut(data.pid);
+
+		// Remove player from sockets dictionary
+		var index = clients[data.rid].indexOf(client);
+		if (index > -1) {
+			clients[data.rid].splice(index, 1);
+		}
+
+		// Remove the game if the room is empty
 		if (game.playerCount == 0) {
-			delete games[data.roomId];
+			console.log('Room ' + data.rid + ' has been removed');
+			delete games[data.rid];
+			delete clients[data.rid];
 			gameCount--;
 		}
 	});
@@ -110,7 +142,10 @@ setInterval(function () {
 
 // Status report for debugging
 setInterval(function () {
-	console.log("Num instances: " + Object.keys(games).length + "  Num connections: " + connections);
+	console.log("All game instances");
+	for (var key in games) {
+		console.log("  - Game: " + games[key].rid + " has " + games[key].playerCount + " players");
+	}
 }, 5000);
 
 function getRandomInt(min, max) {

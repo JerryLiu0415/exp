@@ -9,7 +9,7 @@ var localPlayerId;
 
 var config = {
 	name: '',
-	roomId: 1,
+	rid: 1,
 	type: 1,
 }
 
@@ -19,27 +19,27 @@ socket.on('sync', function (data) {
 		if (localData == null) {
 			return;
 		}
-		render.refresh(localData.donuts, data["time"]);
+		render.refresh(localData, data["time"]);
 	}
 });
 
 socket.on('joined', function (data) {
 	joined = true;
-	localRoomId = data.roomId;
-	localPlayerId = data.donutId;
+	localRoomId = data.rid;
+	localPlayerId = data.pid;
 	render = new Render('#arena', localPlayerId, localRoomId, socket);
+	updateChat(data.initData.messages);
 	$('#chat').show();
+	$('#button').show();
 });
 
 socket.on('message', function (data) {
-	$('#chat-history').empty();
-	for (var i = data.length - 1; i >= 0; i--) {
-		$('#chat-history').append('<label type="text" class="chat-bubble">' + data[i] + '</label>');
-	}
+	updateChat(data);
 });
 
 $(document).ready(function () {
 	$('#chat').hide();
+	$('#button').hide();
 	$(document).on("contextmenu", function (e) {
 		if (e.target.nodeName != "INPUT" && e.target.nodeName != "TEXTAREA")
 			e.preventDefault();
@@ -47,8 +47,8 @@ $(document).ready(function () {
 
 	$('#join').click(function () {
 		config.name = $('#donut-name').val();
-		config.roomId = $('#room-id').val();
-		if (config.name != '' && config.roomId != 1) {
+		config.rid = $('#room-id').val();
+		if (config.name != '' && config.rid != 1) {
 			joinGame(config);
 		} else {
 			alert("Please your name and the room id to join or create");
@@ -60,7 +60,7 @@ $(document).ready(function () {
 	});
 
 	$('#room-id').keyup(function (e) {
-		config.roomId = $('#room-id').val();
+		config.rid = $('#room-id').val();
 	});
 
 	$('ul.donut-selection li').click(function () {
@@ -73,6 +73,13 @@ $(document).ready(function () {
 		var msg = $('#chat-to-send').val();
 		var k = e.keyCode || e.which;
 		if (k == 13) {
+			if (msg == '') {
+				return;
+			}
+			$(this).val('');
+			var time = new Date();
+			var timeStamp = time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
+			msg = '(' + timeStamp + ') ' + config.name + ": " + msg;
 			sendMsg(msg);
 		}
 	});
@@ -80,7 +87,11 @@ $(document).ready(function () {
 });
 
 $(window).on('beforeunload', function () {
-	socket.emit('leave', { roomId: render.roomId, donutId: render.donutId });
+	var time = new Date();
+	var timeStamp = time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
+	var leaveMsg = '(' + timeStamp + ') PLAYER \'' + config.name + '\' HAS LEFT THE GAME';
+	sendMsg(leaveMsg);
+	socket.emit('leave', { rid: localRoomId, pid: localPlayerId });
 });
 
 function joinGame(data) {
@@ -89,6 +100,17 @@ function joinGame(data) {
 }
 
 function sendMsg(data) {
-	$(this).val('#chat-to-send');
-	socket.emit('message', { content: data, pname: config.name, rid: localRoomId });
+	socket.emit('message', { content: data, rid: localRoomId });
+}
+
+function updateChat(data) {
+	$('#chat-history').empty();
+	for (var i = data.length - 1; i >= 0; i--) {
+		$('#chat-history').append('<label type="text" id="' + i + '" class="chat-bubble"><strong>'
+			+ data[i] + '</strong></label>');
+		// https://stackoverflow.com/questions/275931/how-do-you-make-an-element-flash-in-jquery
+		if (i == data.length - 1) {
+			$('#' + i).fadeTo(100, 0.3, function () { $(this).fadeTo(500, 1.0); });
+		}
+	}
 }

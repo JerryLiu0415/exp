@@ -7,11 +7,13 @@ class Render {
         this.$arena = $(arenaId);
         this.$arena.css('width', 1100);
         this.$arena.css('height', 580);
-        this.$chat = $('#chat-history');
+        this.$chat = $('#chat');
         this.roomId = roomId;
         this.playerId = playerId;
         this.donut_renders = {};
+        this.bullet_renders = {};
         this.donutData_prev = {};
+        this.bulletData_prev = {};
 
         this.timeStamp_prev = 1;
         this.localDonut = null;
@@ -24,46 +26,77 @@ class Render {
     }
 
     materialize() {
-        this.$arena.append('<div class="room-id"> You are in room: ' + this.roomId + ' </div>');
+        this.$arena.append('<div class="room-id" id="particles"> You are in room: ' + this.roomId + ' </div>');
         this.$arena.append('<div class="arena-ping" id="ping"></div>');
+
     }
 
     refresh(data, time) {
+        if (data.donuts[this.playerId].cdQ == 0) {
+            $('#q').html("Ready!");
+        } else {
+            $('#q').html((data.donuts[this.playerId].cdQ / 100).toFixed(1) + "s");
+        }
         $('#ping').html((new Date().getTime() - time) * 2 + " ms");
         this.removeZombies(data);
         this.addNewBorns(data);
         this.localDonut = this.donut_renders[this.playerId];
 
         // Refresh each donuts
-        for (var key in this.donut_renders) {
-            this.donut_renders[key].refresh(data[key]);
+        for (let key in this.donut_renders) {
+            this.donut_renders[key].refresh(data.donuts[key]);
         }
 
-        this.donutData_prev = data;
+        for (let key in this.bullet_renders) {
+            this.bullet_renders[key].refresh(data.bullets[key]);
+        }
+
+        this.donutData_prev = data.donuts;
+        this.bulletData_prev = data.bullets;
     }
 
     // Remove (.hide) donuts that no longer exists
     removeZombies(data) {
-        for (var key in this.donutData_prev) {
-            if (data[key] == null) {
+        for (let key in this.donutData_prev) {
+            if (data.donuts[key] == null) {
                 this.donut_renders[key].remove();
                 delete this.donut_renders[key];
+            }
+        }
+        for (let key in this.bulletData_prev) {
+            if (data.bullets[key] == null) {
+                this.bullet_renders[key].remove();
+                delete this.bullet_renders[key];
             }
         }
     }
 
     // Remove donuts that no longer exists
     addNewBorns(data) {
-        for (var key in data) {
+        for (let key in data.donuts) {
             if (this.donutData_prev[key] == null) {
-                this.donut_renders[key] = new Render_Donut(this.arenaId, data[key]);
+                this.donut_renders[key] = new Render_Donut(this.arenaId, data.donuts[key]);
+            }
+        }
+        for (let key in data.bullets) {
+            if (this.bulletData_prev[key] == null) {
+                console.log("add " + key);
+                this.bullet_renders[key] = new Render_Bullet(this.arenaId, data.bullets[key]);
             }
         }
     }
 
     setControls() {
         var self = this;
-        $(document).mousemove(function (e) {
+        $(document).keypress(function (e) {
+            var k = e.which;
+            switch (k) {
+                case 113: //Q
+                    self.shootQ();
+                    break;
+            }
+
+        }).mousemove(function (e) {
             var point = {
                 x: event.pageX - self.$arena.offset().left,
                 y: event.pageY - self.$arena.offset().top
@@ -93,6 +126,20 @@ class Render {
                 default:
             }
         });
+    }
+
+    shootQ() {
+        var me = this.localDonut;
+        if (me == null || me.donutData.cdQ != 0) {
+            return;
+        }
+        console.log("s");
+        this.client.emit('shootQ', {
+            pid: this.playerId, rid: this.roomId,
+            from: { x: me.donutData.x, y: me.donutData.y },
+            to: { x: this.pointing.x, y: this.pointing.y }
+        });
+
     }
 
     move() {
