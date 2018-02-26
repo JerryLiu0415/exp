@@ -34,8 +34,10 @@ class Render {
     refresh(data, time) {
         if (data.donuts[this.playerId].cdQ == 0) {
             $('#q').html("Ready!");
+            $('#q').css('opacity', '1');
         } else {
             $('#q').html((data.donuts[this.playerId].cdQ / 100).toFixed(1) + "s");
+            $('#q').css('opacity', '0.3');
         }
         $('#ping').html((new Date().getTime() - time) * 2 + " ms");
         this.removeZombies(data);

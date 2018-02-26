@@ -103,6 +103,7 @@ class GameServer {
         return data;
     }
 
+
     onCollision(event) {
         event.pairs.forEach(pair => {
             if (pair.bodyA.label == "wall") {
@@ -115,6 +116,13 @@ class GameServer {
                 if (pair.bodyB.label == "wall") {
                     this.cleanBullet(pair.bodyA.label);
                 } else if (pair.bodyB.label in this.bullets) {
+                } else if (pair.bodyB.label in this.donuts) {
+                    this.donuts[pair.bodyB.label].hp--;
+                } else {
+                }
+            } else if (pair.bodyA.label in this.donuts) {
+                if (pair.bodyB.label in this.bullets) {
+                    this.donuts[pair.bodyA.label].hp--;
                 } else {
                 }
             } else {

@@ -54,7 +54,7 @@ io.on('connection', function (client) {
 		if (client_game.donuts[data.pid] == null) {
 			return;
 		}
-		client_game.donuts[data.pid].cdQ = 1;
+		client_game.donuts[data.pid].cdQ = 250;
 	});
 
 	client.on('move', function (data) {
@@ -144,7 +144,8 @@ setInterval(function () {
 setInterval(function () {
 	console.log("All game instances");
 	for (var key in games) {
-		console.log("  - Game: " + games[key].rid + " has " + games[key].playerCount + " players");
+		console.log("  - Game: " + games[key].rid + " has "
+			+ Object.keys(games[key].donuts).length + " player(s)");
 	}
 }, 5000);
 

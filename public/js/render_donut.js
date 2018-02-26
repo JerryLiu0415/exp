@@ -37,6 +37,8 @@ class Render_Donut {
         // Info
         this.$info.css('left', (this.donutData.x + 10) + 'px');
         this.$info.css('top', (this.donutData.y) + 'px');
+        this.$info.find('.hp-bar').css('width', this.donutData.hp * 10 + 'px');
+        this.$info.find('.hp-bar').css('background-color', getGreenToRed(this.donutData.hp));
 
     }
 
@@ -44,4 +46,11 @@ class Render_Donut {
         this.$body.remove();
         this.$info.remove();
     }
+}
+
+
+function getGreenToRed(percent) {
+    r = percent < 5 ? 255 : Math.floor(255 - (percent * 20 - 100) * 255 / 100);
+    g = percent > 5 ? 255 : Math.floor((percent * 20) * 255 / 100);
+    return 'rgb(' + r + ',' + g + ',0)';
 }
