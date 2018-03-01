@@ -3,8 +3,6 @@ var app = express();
 var PhysicsWorld = require('./physics.js');
 var GameServer = require('./gameServer.js');
 var INTERVAL = 10;
-var gameCount = 0;
-
 
 app.use(express.static(__dirname + '/public'));
 
@@ -14,29 +12,36 @@ var server = app.listen(process.env.PORT || 5004, function () {
 });
 
 var io = require('socket.io')(server);
+
+// All client sockets stored here, indexed by room id
 var clients = {};
 
-// All instances of games stored here
+// All instances of games stored here, indexed by room id
 var games = {};
 
 /* Connection events */
 io.on('connection', function (client) {
 	console.log('User connected');
 
+	/**
+	 *  Client will send the character position and mouse position to this route
+	 *  
+	 *  Client data structure {name: ..., rid: ..., type: ... }
+	 */
 	client.on('joinGame', function (data) {
 		console.log('User connected');
 		// Create a new room
 		var rid = data.rid;
 		let pid = UID();
 		if (!(data.rid in games)) {
+			// Room id doesn't exist
 			console.log('Creating new room...');
 			rid = UID();
 			games[rid] = new GameServer(rid, pid);
 			clients[rid] = [];
-			gameCount++;
 		}
-		let initX = 0;//getRandomInt(40, 900);
-		let initY = 0;//getRandomInt(40, 500);
+		let initX = 10; //getRandomInt(40, 900);
+		let initY = 10; //getRandomInt(40, 500);
 		let game = games[rid];
 		game.addDonut(initX, initY, data.name, data.type, pid);
 		clients[rid].push(client);
@@ -44,6 +49,12 @@ io.on('connection', function (client) {
 		console.log("User with id " + pid + " has successfully joined room " + game.rid);
 	});
 
+	/**
+	 *  This route handles cases when player is casting Q ability 
+	 *  Client will send the character position and mouse position to this route
+	 *  
+	 *  Client data structure {pid: ..., from: { x: ..., y: ... }, to: { x: ..., y: ... } }
+	 */
 	client.on('shootQ', function (data) {
 		var client_game = games[data.rid];
 		if (client_game == null) {
@@ -54,9 +65,15 @@ io.on('connection', function (client) {
 		if (client_game.donuts[data.pid] == null) {
 			return;
 		}
-		client_game.donuts[data.pid].cdQ = 250;
+		client_game.donuts[data.pid].cdQ = 100;
 	});
 
+
+	/**
+	 *  Client will send the move signal along with expected heading point
+	 * 
+	 *  Client data structure { pid: ..., rid: ..., dir: ...}
+	 */
 	client.on('move', function (data) {
 		var client_game = games[data.rid];
 		if (client_game == null) {
@@ -118,7 +135,6 @@ io.on('connection', function (client) {
 			console.log('Room ' + data.rid + ' has been removed');
 			delete games[data.rid];
 			delete clients[data.rid];
-			gameCount--;
 		}
 	});
 });

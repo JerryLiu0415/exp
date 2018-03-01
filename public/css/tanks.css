@@ -60,10 +60,21 @@ body{
 	z-index: 2;
 }
 
-.button-block{
+.button-blockQ{
 	width: 100px;
 	height: 100px;
 	background-image: url("../img/testQButton.png");
+	position: relative;
+	text-align: center;
+	font-size: 25px;
+	color: rgb(0, 183, 255);
+	float: left;
+}
+
+.button-blockW{
+	width: 100px;
+	height: 100px;
+	background-image: url("../img/testWButton.png");
 	position: relative;
 	text-align: center;
 	font-size: 25px;

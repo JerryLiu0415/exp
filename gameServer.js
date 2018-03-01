@@ -1,6 +1,7 @@
 var PhysicsWorld = require('./physics.js');
 var staticData = require('./gameStaticData');
 
+// Game structure
 class GameServer {
     constructor(id, host) {
         // Physics Engine

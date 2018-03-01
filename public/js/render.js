@@ -17,6 +17,7 @@ class Render {
 
         this.timeStamp_prev = 1;
         this.localDonut = null;
+        this.timeOld = 0;
 
 
         this.heading = null;
@@ -32,6 +33,8 @@ class Render {
     }
 
     refresh(data, time) {
+        console.log(time - this.timeOld);
+        this.timeOld = time;
         if (data.donuts[this.playerId].cdQ == 0) {
             $('#q').html("Ready!");
             $('#q').css('opacity', '1');

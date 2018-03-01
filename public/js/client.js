@@ -1,11 +1,12 @@
 // This IP is hardcoded to my server, replace with your own
 // 'https://oooppp.herokuapp.com'
 // 'http://localhost:5004'
-var socket = io.connect('https://oooppp.herokuapp.com');
+var socket = io.connect('http://localhost:5004');
 var render;
 var joined = false;
 var localRoomId;
 var localPlayerId;
+var showChat = false;
 
 var config = {
 	name: '',
@@ -40,6 +41,15 @@ socket.on('message', function (data) {
 $(document).ready(function () {
 	$('#chat').hide();
 	$('#button').hide();
+
+	$(document).keypress(function (e) {
+		var k = e.which;
+		switch (k) {
+			case 121: //Y
+				showHideChat();
+		}
+	});
+
 	$(document).on("contextmenu", function (e) {
 		if (e.target.nodeName != "INPUT" && e.target.nodeName != "TEXTAREA")
 			e.preventDefault();
@@ -113,4 +123,12 @@ function updateChat(data) {
 			$('#' + i).fadeTo(100, 0.3, function () { $(this).fadeTo(500, 1.0); });
 		}
 	}
+}
+
+function showHideChat() {
+	if (!joined) {
+		return;
+	}
+	showChat = !showChat;
+	showChat ? $('#chat').show() : $('#chat').hide();
 }
