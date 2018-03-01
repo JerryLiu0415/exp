@@ -1,7 +1,7 @@
 // This IP is hardcoded to my server, replace with your own
 // 'https://oooppp.herokuapp.com'
 // 'http://localhost:5004'
-var socket = io.connect('http://localhost:5004');
+var socket = io.connect('https://oooppp.herokuapp.com');
 var render;
 var joined = false;
 var localRoomId;
