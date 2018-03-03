@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var PhysicsWorld = require('./physics.js');
 var GameServer = require('./gameServer.js');
-var INTERVAL = 15;
+var INTERVAL = 10;
 
 app.use(express.static(__dirname + '/public'));
 

@@ -78,7 +78,7 @@ class PhysicsWorld {
     }
 
     nextState() {
-        Engine.update(this.engine, 5);
+        Engine.update(this.engine, 2.5);
     }
 }
 

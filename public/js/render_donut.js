@@ -26,8 +26,8 @@ class Render_Donut {
     refresh(donutData) {
         this.donutData = donutData;
         // Body
-        this.$body.css('left', this.donutData.x - 30 + 'px');
-        this.$body.css('top', this.donutData.y - 40 + 'px');
+        this.$body.css('left', (this.donutData.x).toFixed(1) - 30 + 'px');
+        this.$body.css('top', (this.donutData.y).toFixed(1) - 40 + 'px');
 
         this.$body.css('-webkit-transform', 'rotateZ(' + this.donutData.angle + 'deg)');
         this.$body.css('-moz-transform', 'rotateZ(' + this.donutData.angle + 'deg)');
@@ -35,8 +35,8 @@ class Render_Donut {
         this.$body.css('transform', 'rotateZ(' + this.donutData.angle + 'deg)');
 
         // Info
-        this.$info.css('left', (this.donutData.x + 10) + 'px');
-        this.$info.css('top', (this.donutData.y) + 'px');
+        this.$info.css('left', ((this.donutData.x).toFixed(1) + 10) + 'px');
+        this.$info.css('top', (this.donutData.y).toFixed(1) + 'px');
         this.$info.find('.hp-bar').css('width', this.donutData.hp * 10 + 'px');
         this.$info.find('.hp-bar').css('background-color', getGreenToRed(this.donutData.hp));
 
