@@ -137,7 +137,6 @@ class Render {
         if (me == null || me.donutData.cdQ != 0) {
             return;
         }
-        console.log("s");
         this.client.emit('shootQ', {
             pid: this.playerId, rid: this.roomId,
             from: { x: me.donutData.x, y: me.donutData.y },
