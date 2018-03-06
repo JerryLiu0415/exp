@@ -33,7 +33,6 @@ class Render {
     }
 
     refresh(data, time) {
-        console.log(time - this.timeOld);
         this.timeOld = time;
         if (data.donuts[this.playerId].cdQ == 0) {
             $('#q').html("Ready!");
