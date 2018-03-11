@@ -50,8 +50,11 @@ class GameServer {
             angle: 0,
             id: id,
             cdQ: 0,
+            cdW: 0,
+            cdW2: 0,
             dead: false,
-            kill: 0
+            kill: 0,
+            invisible: false
         };
         this.phys.addInitialBody(x, y, staticData[type].RADIUS, staticData[type].MASS, 0, id);
     }
@@ -79,6 +82,9 @@ class GameServer {
     cleanDonut(pid) {
         delete this.donuts[pid];
         this.phys.removeBody(pid);
+        if (pid == this.host && Object.keys(this.donuts).length > 0) {
+            this.host = this.donuts[Object.keys(this.donuts)[0]].id;
+        }
     }
 
     cleanBullet(pid) {
@@ -152,6 +158,19 @@ class GameServer {
             // CD 
             if (this.donuts[key].cdQ > 0) {
                 this.donuts[key].cdQ--;
+            }
+
+            if (this.donuts[key].cdW > 0) {
+                this.donuts[key].cdW--;
+            }
+
+
+            if (this.donuts[key].cdW2 > 0) {
+                this.donuts[key].cdW2--;
+            }
+
+            if (this.donuts[key].cdW2 == 0) {
+                this.donuts[key].invisible = false;
             }
 
             if (this.freeze) {
@@ -232,10 +251,9 @@ class GameServer {
                 } else if (pair.bodyB.label in this.bullets) {
                 } else if (pair.bodyB.label in this.donuts) {
                     this.donuts[pair.bodyB.label].hp--;
+                    this.donuts[pair.bodyB.label].invisible = false;
                     if (this.donuts[pair.bodyB.label].hp == 0) {
-                        console.log(pair.bodyA.label);
                         var attacker = pair.bodyA.label.split("-")[0];
-                        console.log(attacker);
                         this.donuts[attacker].kill++;
                     }
                 } else {
@@ -243,10 +261,9 @@ class GameServer {
             } else if (pair.bodyA.label in this.donuts) {
                 if (pair.bodyB.label in this.bullets) {
                     this.donuts[pair.bodyA.label].hp--;
+                    this.donuts[pair.bodyA.label].invisible = false;
                     if (this.donuts[pair.bodyA.label].hp == 0) {
-                        console.log(pair.bodyB.label);
                         var attacker = pair.bodyB.label.split("-")[0];
-                        console.log(attacker);
                         this.donuts[attacker].kill++;
                     }
                 } else {

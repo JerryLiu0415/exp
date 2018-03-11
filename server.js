@@ -54,21 +54,31 @@ io.on('connection', function (client) {
 	 *  This route handles cases when player is casting Q ability 
 	 *  Client will send the character position and mouse position to this route
 	 *  
-	 *  Client data structure {pid: ..., from: { x: ..., y: ... }, to: { x: ..., y: ... } }
+	 *  Client data structure {rid: ..., pid: ..., from: { x: ..., y: ... }, to: { x: ..., y: ... } }
 	 *  
 	 */
-	client.on('shootQ', function (data) {
+	client.on('Q', function (data) {
 		var client_game = games[data.rid];
-		if (client_game == null) {
+		if (client_game == null || client_game.donuts[data.pid].cdQ != 0) {
 			return;
 		}
 		// Bullet object has id of the form: <owner id> + '-B-' + <ramdom id>
+		client_game.donuts[data.pid].cdQ = 100;
 		var bid = data.pid + '-B-' + UID();
 		client_game.addBullet(data.from.x, data.from.y, data.to.x, data.to.y, 1, bid);
-		if (client_game.donuts[data.pid] == null) {
+	});
+
+	/**
+	 * 
+	 */
+	client.on('W', function (data) {
+		var client_game = games[data.rid];
+		if (client_game == null || client_game.donuts[data.pid].cdW != 0) {
 			return;
 		}
-		client_game.donuts[data.pid].cdQ = 100;
+		client_game.donuts[data.pid].cdW = 1000;
+		client_game.donuts[data.pid].cdW2 = 500;
+		client_game.donuts[data.pid].invisible = true;
 	});
 
 	/**

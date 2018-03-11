@@ -38,6 +38,15 @@ class Render {
             $('#q').html((data.donuts[this.playerId].cdQ / 100).toFixed(1) + "s");
             $('#q').css('opacity', '0.3');
         }
+
+        if (data.donuts[this.playerId].cdW == 0) {
+            $('#w').html("Ready!");
+            $('#w').css('opacity', '1');
+        } else {
+            $('#w').html((data.donuts[this.playerId].cdW / 100).toFixed(1) + "s");
+            $('#w').css('opacity', '0.3');
+        }
+
         this.removeZombies(data);
         this.addNewBorns(data);
 
@@ -86,7 +95,7 @@ class Render {
     addNewBorns(data) {
         for (let key in data.donuts) {
             if (this.donutData_prev[key] == null) {
-                this.donut_renders[key] = new Render_Donut(this.arenaId, data.donuts[key]);
+                this.donut_renders[key] = new Render_Donut(this.arenaId, data.donuts[key], key == this.playerId);
             }
         }
         for (let key in data.bullets) {
@@ -104,6 +113,9 @@ class Render {
             switch (k) {
                 case 113: //Q
                     self.shootQ();
+                    break;
+                case 119: //W
+                    self.shootW();
                     break;
             }
 
@@ -142,15 +154,21 @@ class Render {
     shootQ() {
         var me = this.localDonut;
         if (me == null || me.donutData.cdQ != 0 || me.donutData.dead) {
-            console.log(me.donutData.dead);
             return;
         }
-        this.client.emit('shootQ', {
+        this.client.emit('Q', {
             pid: this.playerId, rid: this.roomId,
             from: { x: me.donutData.x, y: me.donutData.y },
             to: { x: this.pointing.x, y: this.pointing.y }
         });
 
+    }
+
+    shootW() {
+        this.client.emit('W', {
+            pid: this.playerId,
+            rid: this.roomId
+        });
     }
 
     move() {

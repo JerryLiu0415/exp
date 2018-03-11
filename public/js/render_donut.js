@@ -1,9 +1,10 @@
 class Render_Donut {
-    constructor(arenaId, donutData) {
+    constructor(arenaId, donutData, isLocal) {
         this.timer = 0;
         this.$arena = $(arenaId);
         this.donutData = donutData;
-        this.hp_prev = donutData.hp;
+        this.donutData_prev = donutData;
+        this.isLocal = isLocal;
         this.materialize();
     }
 
@@ -30,10 +31,32 @@ class Render_Donut {
     refresh(donutData) {
         this.timer++;
         this.donutData = donutData;
+
+
+        // Inv
+        if (!this.isLocal && this.donutData.invisible && !this.donutData_prev.invisible) {
+            this.$body.fadeOut(500);
+            this.$info.fadeOut(500);
+
+        }
+
+        if (!this.isLocal && !this.donutData.invisible && this.donutData_prev.invisible) {
+            this.$body.fadeIn(500);
+            this.$info.fadeIn(500);
+        }
+
+        if (this.isLocal && this.donutData.invisible && !this.donutData_prev.invisible) {
+            this.$body.fadeTo(500, 0.4);
+        }
+
+        if (this.isLocal && !this.donutData.invisible && this.donutData_prev.invisible) {
+            this.$body.fadeTo(500, 1);
+        }
+
         // Body
         this.$body.css('left', (this.donutData.x).toFixed(1) - 30 + 'px');
         this.$body.css('top', (this.donutData.y).toFixed(1) - 40 + 'px');
-        this.donutData.dead ? this.$body.css('opacity', '0.3') : this.$body.css('opacity', '1');
+        //this.donutData.dead ? this.$body.css('opacity', '0.3') : this.$body.css('opacity', '1');
 
         this.$body.css('-webkit-transform', 'rotateZ(' + this.donutData.angle + 'deg)');
         this.$body.css('-moz-transform', 'rotateZ(' + this.donutData.angle + 'deg)');
@@ -46,10 +69,10 @@ class Render_Donut {
         this.$info.find('.hp-bar').css('width', this.donutData.hp * (100.0 / this.donutData.maxHp) + 'px');
         this.$info.find('.hp-bar').css('background-color', getGreenToRed(this.donutData.hp, this.donutData.maxHp));
 
-        if (parseInt(this.hp_prev) > parseInt(this.donutData.hp)) {
+        if (parseInt(this.donutData_prev.hp) > parseInt(this.donutData.hp)) {
             this.onHitAnimation();
         }
-        this.hp_prev = this.donutData.hp;
+        this.donutData_prev = this.donutData;
     }
 
     remove() {
