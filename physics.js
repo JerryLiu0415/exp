@@ -18,19 +18,14 @@ class PhysicsWorld {
         // var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
         this.engine.world.gravity = { x: 0, y: 0, scale: 0.001 };
 
-        var topWall = Bodies.rectangle(500, 0, 1200, 5, { isStatic: true, restitution: 0.5, label: "wall" });
-        var leftWall = Bodies.rectangle(-10, 290, 5, 1000, { isStatic: true, restitution: 0.5, label: "wall" });
+        var topWall = Bodies.rectangle(500, 0, 1150, 5, { isStatic: true, restitution: 0.5, label: "wall" });
+        var leftWall = Bodies.rectangle(-10, 290, 5, 600, { isStatic: true, restitution: 0.5, label: "wall" });
         var botWall = Bodies.rectangle(500, 580, 1200, 5, { isStatic: true, restitution: 0.5, label: "wall" });
-        var rightWall = Bodies.rectangle(1090, 290, 5, 1000, { isStatic: true, restitution: 0.5, label: "wall" });
+        var rightWall = Bodies.rectangle(1090, 290, 5, 600, { isStatic: true, restitution: 0.5, label: "wall" });
         World.add(this.engine.world, [botWall, topWall, leftWall, rightWall]);
 
         var self = this;
         Events.on(this.engine, "collisionStart", function (event) {
-            // console.log("!!!!!!");
-            // event.pairs.forEach(element => {
-            //     console.log(element.bodyA.label);
-            //     console.log(element.bodyB.label);
-            // });
             self.gameServer.onCollision(event);
         });
     }
@@ -73,12 +68,25 @@ class PhysicsWorld {
     }
 
     removeBody(pid) {
-        var body = this.engine.world.bodies.filter(function (b) { return b.label == pid })[0];
+        var body = this.getBody(pid);
         Matter.Composite.remove(this.engine.world, body);
+    }
+
+    goToHell(pid) {
+        var body = this.getBody(pid);
+        this.teleportTo(body, 1200, 100);
     }
 
     nextState() {
         Engine.update(this.engine, 5);
+    }
+
+    teleportTo(body, x, y) {
+        Matter.Body.setPosition(body, { x: x, y: y });
+    }
+
+    rotateTo(body, alpha) {
+        Matter.Body.setAngle(body, alpha);
     }
 }
 

@@ -27,6 +27,7 @@ io.on('connection', function (client) {
 	 *  Client will send the character position and mouse position to this route
 	 *  
 	 *  Client data structure {name: ..., rid: ..., type: ... }
+	 *  Server data structure {rid: ..., pid: ..., initData: ... }
 	 */
 	client.on('joinGame', function (data) {
 		console.log('User connected');
@@ -54,12 +55,14 @@ io.on('connection', function (client) {
 	 *  Client will send the character position and mouse position to this route
 	 *  
 	 *  Client data structure {pid: ..., from: { x: ..., y: ... }, to: { x: ..., y: ... } }
+	 *  
 	 */
 	client.on('shootQ', function (data) {
 		var client_game = games[data.rid];
 		if (client_game == null) {
 			return;
 		}
+		// Bullet object has id of the form: <owner id> + '-B-' + <ramdom id>
 		var bid = data.pid + '-B-' + UID();
 		client_game.addBullet(data.from.x, data.from.y, data.to.x, data.to.y, 1, bid);
 		if (client_game.donuts[data.pid] == null) {
@@ -67,7 +70,6 @@ io.on('connection', function (client) {
 		}
 		client_game.donuts[data.pid].cdQ = 100;
 	});
-
 
 	/**
 	 *  Client will send the move signal along with expected heading point
@@ -100,6 +102,7 @@ io.on('connection', function (client) {
 	 *  Historical messages for each game (room) are stored at gameServer
 	 * 
 	 *  Client data structure { content: ..., rid: ...}
+	 *  Server data structure { messages: ...}
 	 */
 	client.on('message', function (data) {
 		var client_game = games[data.rid];
@@ -131,7 +134,7 @@ io.on('connection', function (client) {
 		}
 
 		// Remove the game if the room is empty
-		if (game.playerCount == 0) {
+		if (Object.keys(game.donuts).length == 0) {
 			console.log('Room ' + data.rid + ' has been removed');
 			delete games[data.rid];
 			delete clients[data.rid];
@@ -140,6 +143,9 @@ io.on('connection', function (client) {
 });
 
 // Main loop 
+// Server data structure {gameid1: ..., gameid2:..., ...}
+// gameidi: {gameId: ..., donuts: ..., messages: ..., bullets: ...}
+// 
 setInterval(function () {
 	// Apply physics and Game Logic 
 	clientGames = {};

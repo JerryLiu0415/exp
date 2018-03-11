@@ -19,9 +19,10 @@ class Render {
         this.localDonut = null;
         this.timeOld = 0;
 
-
         this.heading = null;
         this.pointing = null;
+
+        this.restartMsgInformed = false;
         this.materialize();
         this.setControls();
     }
@@ -33,7 +34,6 @@ class Render {
     }
 
     refresh(data, time) {
-        this.timeOld = time;
         if (data.donuts[this.playerId].cdQ == 0) {
             $('#q').html("Ready!");
             $('#q').css('opacity', '1');
@@ -41,9 +41,10 @@ class Render {
             $('#q').html((data.donuts[this.playerId].cdQ / 100).toFixed(1) + "s");
             $('#q').css('opacity', '0.3');
         }
-        $('#ping').html((new Date().getTime() - time) * 2 + " ms");
         this.removeZombies(data);
         this.addNewBorns(data);
+
+        // Local donut
         this.localDonut = this.donut_renders[this.playerId];
 
         // Refresh each donuts
@@ -53,6 +54,14 @@ class Render {
 
         for (let key in this.bullet_renders) {
             this.bullet_renders[key].refresh(data.bullets[key]);
+        }
+
+        if (data.freeze && !this.restartMsgInformed) {
+            popUpMessage("Prepare for next battle...");
+            this.restartMsgInformed = true;
+        }
+        if (!data.freeze) {
+            this.restartMsgInformed = false;
         }
 
         this.donutData_prev = data.donuts;
@@ -134,7 +143,8 @@ class Render {
 
     shootQ() {
         var me = this.localDonut;
-        if (me == null || me.donutData.cdQ != 0) {
+        if (me == null || me.donutData.cdQ != 0 || me.donutData.dead) {
+            console.log(me.donutData.dead);
             return;
         }
         this.client.emit('shootQ', {
@@ -182,4 +192,12 @@ function UID() {
     var key3 = Math.floor(Math.random() * 1000).toString();
     var key4 = Math.floor(Math.random() * 1000).toString();
     return (key1 + key2 + key3 + key4);
+}
+
+function popUpMessage(msg) {
+    $('body').append('<div id="game-prompt-dead" class="game-prompt-dead"><strong>' + msg + '</strong></div>');
+    $('#game-prompt-dead').fadeTo(3000, 0.1);
+    setTimeout(function () {
+        $('#game-prompt-dead').remove();
+    }, 3000);
 }

@@ -7,6 +7,9 @@ var joined = false;
 var localRoomId;
 var localPlayerId;
 var showChat = false;
+var dataPrev = null;
+
+var queue = [];
 
 var config = {
 	name: '',
@@ -14,14 +17,30 @@ var config = {
 	type: 1,
 }
 
+// setInterval(function () {
+// 	if (joined) {
+// 		if (queue.length > 1) {
+// 			var data = queue.shift();
+// 			var localData = data[localRoomId];
+// 			if (localData == null) {
+// 				return;
+// 			}
+// 			render.refresh(localData);
+// 		}
+// 	}
+// }, 10);
+
 socket.on('sync', function (data) {
 	if (joined) {
 		var localData = data[localRoomId];
 		if (localData == null) {
 			return;
 		}
-		render.refresh(localData, data["time"]);
+		render.refresh(localData);
+
 	}
+	dataPrev = data;
+	// queue.push(data);
 });
 
 socket.on('joined', function (data) {
@@ -30,7 +49,6 @@ socket.on('joined', function (data) {
 	localPlayerId = data.pid;
 	render = new Render('#arena', localPlayerId, localRoomId, socket);
 	updateChat(data.initData.messages);
-	$('#chat').show();
 	$('#button').show();
 });
 
@@ -38,9 +56,27 @@ socket.on('message', function (data) {
 	updateChat(data);
 });
 
+// Controller
 $(document).ready(function () {
 	$('#chat').hide();
 	$('#button').hide();
+
+	$('#existing-games').mousedown(function () {
+		$(this).empty();
+		$(this).append('<option value=1>Create new room</option>');
+		for (var key in dataPrev) {
+			if (key != "time") {
+				const name = (dataPrev[key].donuts)[dataPrev[key].host].name + "'s room ";
+				const id = "(" + key + ")";
+				var content = name + id + " with " + Object.keys(dataPrev[key].donuts).length + " player(s)";
+				$(this).append('<option value=' + key + '>' + content + '</option>');
+			}
+		}
+	});
+
+	$('#existing-games').change(function () {
+		config.rid = $(this).val();
+	});
 
 	$(document).keypress(function (e) {
 		var k = e.which;
@@ -57,11 +93,10 @@ $(document).ready(function () {
 
 	$('#join').click(function () {
 		config.name = $('#donut-name').val();
-		config.rid = $('#room-id').val();
-		if (config.name != '' && config.rid != 1) {
+		if (config.name != '') {
 			joinGame(config);
 		} else {
-			alert("Please your name and the room id to join or create");
+			alert("Please enter a name");
 		}
 	});
 
@@ -132,3 +167,12 @@ function showHideChat() {
 	showChat = !showChat;
 	showChat ? $('#chat').show() : $('#chat').hide();
 }
+
+function popUpMessage(msg) {
+	$('body').append('<div id="game-prompt-dead" class="game-prompt-dead"><p>' + msg + '</p></div>');
+	$('#game-prompt-dead').fadeTo(3000, 0.1);
+	setTimeout(function () {
+		$('#game-prompt-dead').remove();
+	}, 3000);
+}
+

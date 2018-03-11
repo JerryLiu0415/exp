@@ -1,9 +1,32 @@
 body{
-	background-color: rgb(133, 133, 133);
+	background-color: rgb(0, 0, 0);
 	font-family: Helvetica Neue, Arial;
 	overflow: hidden;
-	background-image: url("body.png");
 }
+
+.select-style {
+    border: 1px solid #ccc;
+    width: auto;
+    border-radius: 3px;
+    overflow: hidden;
+    background: #fafafa url("testbase_0.png") no-repeat 96% 50%;
+}
+
+.select-style select {
+    padding: 5px 8px;
+    width: 130%;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    background-image: none;
+    -webkit-appearance: none;
+}
+
+.select-style select:focus {
+    outline: none;
+}
+
+.select-style select option { padding: 61px;}
 
 .name-prompt{
 	position: absolute;
@@ -23,7 +46,7 @@ body{
 .arena{
 	top: 100px;
 	left: 50px;
-	background-color: white;
+	background-color: rgb(228, 228, 228);
 	position: absolute;
 	pointer-events: none;
 }
@@ -35,6 +58,20 @@ body{
     top: 0px;
 }
 
+.game-prompt-dead{
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 300px;
+	background-color: rgb(214, 214, 214);
+	position: relative;
+	width: 700px;
+	height: 100px;
+	opacity: 0.8;
+	z-index: 2;
+	font-size: 50px;
+	text-align: center;
+}
+
 .chat{
 	top: 100px;
 	right: 20px;
@@ -44,6 +81,19 @@ body{
 	position: absolute;
 	width: 300px;
 	height: 600px;
+	opacity: 0.5;
+	z-index: 2;
+}
+
+.leader-board{
+	top: 600px;
+	right: 400px;
+	margin-left: auto;
+    margin-right: auto;
+	background-color: rgb(214, 214, 214);
+	position: absolute;
+	width: 400px;
+	height: 200px;
 	opacity: 0.5;
 	z-index: 2;
 }
@@ -117,6 +167,15 @@ body{
 		 -o-border-radius: 5px;
 			border-radius: 5px;	
 	background-color: #53ff04;
+}
+
+.tail{
+    opacity: 0.5;
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	border-radius: 5px;	
+	border: solid 2px rgb(100, 100, 100);
 }
 
 .input-group {

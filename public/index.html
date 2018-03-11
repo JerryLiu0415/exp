@@ -30,9 +30,14 @@
 				<input id="donut-name" type="text" class="form-control" placeholder="Player name..." autocomplete="off">
 			</div>
 			<div class="form-group">
-				<strong for="room-id">Room Id:</strong>
-				<input id="room-id" type="text" class="form-control" placeholder="Room to join..." autocomplete="off">
+				<strong for="room-id">Room:</strong>
+				<div class="select-style">
+					<select id="existing-games">
+						<option>Create new room</option>
+					</select>
+				</div>
 			</div>
+
 			<div class="form-group">
 				<span class="input-group-btn">
 					<input id="join" class="btn btn-info btn-sm" type="submit" value="Join the battle">
@@ -43,13 +48,7 @@
 				<label>Choose your character:</label>
 				<ul class="donut-selection">
 					<li class="selected" data-tank="1">
-						<img src="img/testbase.png">
-					</li>
-					<li data-tank="2">
-						<img src="img/testbase.png">
-					</li>
-					<li data-tank="3">
-						<img src="img/testbase.png">
+						<img src="img/testbase_0.png">
 					</li>
 				</ul>
 			</div>
@@ -64,7 +63,8 @@
 	</div>
 	<div id="button" class="buttons">
 		<div id="q" class="button-blockQ"></div>
-		<div id="w" class="button-blockW"></div>
+	</div>
+	<div id="leader-board" class="leader-board">
 	</div>
 
 	<script type="text/javascript" src="js/jquery.min.js"></script>
