@@ -28,9 +28,6 @@ class Render {
     }
 
     materialize() {
-        this.$arena.append('<div class="room-id" id="particles"> You are in room: ' + this.roomId + ' </div>');
-        this.$arena.append('<div class="arena-ping" id="ping"></div>');
-
     }
 
     refresh(data, time) {
@@ -59,6 +56,7 @@ class Render {
         if (data.freeze && !this.restartMsgInformed) {
             popUpMessage("Prepare for next battle...");
             this.restartMsgInformed = true;
+            updateLeaderBoard(data.donuts);
         }
         if (!data.freeze) {
             this.restartMsgInformed = false;
@@ -200,4 +198,27 @@ function popUpMessage(msg) {
     setTimeout(function () {
         $('#game-prompt-dead').remove();
     }, 3000);
+}
+
+function updateLeaderBoard(donuts) {
+    $('#leader-board').empty();
+    var sortedPlayers = [];
+    for (var key in donuts) {
+        sortedPlayers.push(donuts[key]);
+    }
+    sortedPlayers.sort(function (a, b) {
+        return b.kill - a.kill;
+    });
+
+    $('#leader-board').empty();
+    $('#leader-board').append('<p>Leader Board</p>');
+    for (var i = 0; i < sortedPlayers.length; i++) {
+        if (i > 4) {
+            break;
+        }
+        $('#leader-board').append('<div class="leader-board-bubble">' + (i + 1)
+            + '<img src="img/testbase_' + parseInt(sortedPlayers[i].id) % 4 + '.png"/>' +
+            sortedPlayers[i].name + '<div class="leader-board-bubble-score"> Score: ' + sortedPlayers[i].kill +
+            ' </div></div>');
+    }
 }

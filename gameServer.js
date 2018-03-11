@@ -50,7 +50,8 @@ class GameServer {
             angle: 0,
             id: id,
             cdQ: 0,
-            dead: false
+            dead: false,
+            kill: 0
         };
         this.phys.addInitialBody(x, y, staticData[type].RADIUS, staticData[type].MASS, 0, id);
     }
@@ -231,16 +232,32 @@ class GameServer {
                 } else if (pair.bodyB.label in this.bullets) {
                 } else if (pair.bodyB.label in this.donuts) {
                     this.donuts[pair.bodyB.label].hp--;
+                    if (this.donuts[pair.bodyB.label].hp == 0) {
+                        console.log(pair.bodyA.label);
+                        var attacker = pair.bodyA.label.split("-")[0];
+                        console.log(attacker);
+                        this.donuts[attacker].kill++;
+                    }
                 } else {
                 }
             } else if (pair.bodyA.label in this.donuts) {
                 if (pair.bodyB.label in this.bullets) {
                     this.donuts[pair.bodyA.label].hp--;
+                    if (this.donuts[pair.bodyA.label].hp == 0) {
+                        console.log(pair.bodyB.label);
+                        var attacker = pair.bodyB.label.split("-")[0];
+                        console.log(attacker);
+                        this.donuts[attacker].kill++;
+                    }
                 } else {
                 }
             } else {
             }
         });
+    }
+
+    recordKill(pid) {
+        this.donuts[pid].kill++;
     }
 }
 

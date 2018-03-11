@@ -85,17 +85,53 @@ body{
 	z-index: 2;
 }
 
+.chat-history {
+	overflow-y: auto;
+	width: 300px;
+	height: 580px;
+}
+
+.chat-input{
+	top: 580px;
+	position: absolute;
+}
+
+.chat-bubble{
+	padding: 5px;
+	position: relative;
+	pointer-events: none;
+	display: block;
+}
+
 .leader-board{
-	top: 600px;
-	right: 400px;
+	top: 100px;
+	right: 500px; 
 	margin-left: auto;
     margin-right: auto;
-	background-color: rgb(214, 214, 214);
+	background-color: rgb(122, 122, 122);
 	position: absolute;
-	width: 400px;
-	height: 200px;
-	opacity: 0.5;
+	width: 500px;
+	height: 700px;
+	opacity: 0.7;
 	z-index: 2;
+	text-align: center;
+	font-size: 30px;
+}
+
+.leader-board-bubble{
+	text-align: left;
+	margin: 5px;
+	padding: 5px;
+	position: relative;
+	pointer-events: none;
+	display: block;
+	font-size: 50px;
+	background-color:rgb(214, 214, 214);
+}
+
+
+.leader-board-bubble-score{
+	font-size: 20px;
 }
 
 .buttons{
@@ -121,33 +157,17 @@ body{
 	float: left;
 }
 
-.button-blockW{
-	width: 100px;
-	height: 100px;
-	background-image: url("../img/testWButton.png");
-	position: relative;
-	text-align: center;
-	font-size: 25px;
-	color: rgb(0, 183, 255);
-	float: left;
-}
-
-.chat-history {
-	overflow-y: auto;
-	width: 300px;
-	height: 580px;
-}
-
-.chat-input{
-	top: 580px;
+.instructions{
+	top: 740px;
+	left: 1050px;
+	margin-left: auto;
+    margin-right: auto;
 	position: absolute;
-}
-
-.chat-bubble{
-	padding: 5px;
-	position: relative;
-	pointer-events: none;
-	display: block;
+	width: 308px;
+	height: 100px;
+	opacity: 1;
+	z-index: 2;
+	color: white;
 }
 
 .room-id {

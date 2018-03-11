@@ -7,6 +7,7 @@ var joined = false;
 var localRoomId;
 var localPlayerId;
 var showChat = false;
+var showLeaderBoard = false;
 var dataPrev = null;
 
 var queue = [];
@@ -49,7 +50,9 @@ socket.on('joined', function (data) {
 	localPlayerId = data.pid;
 	render = new Render('#arena', localPlayerId, localRoomId, socket);
 	updateChat(data.initData.messages);
+	updateLeaderBoard(data.initData.donuts);
 	$('#button').show();
+	$('#instructions').show();
 });
 
 socket.on('message', function (data) {
@@ -59,8 +62,9 @@ socket.on('message', function (data) {
 // Controller
 $(document).ready(function () {
 	$('#chat').hide();
+	$('#leader-board').hide();
 	$('#button').hide();
-
+	$('#instructions').hide();
 	$('#existing-games').mousedown(function () {
 		$(this).empty();
 		$(this).append('<option value=1>Create new room</option>');
@@ -81,8 +85,17 @@ $(document).ready(function () {
 	$(document).keypress(function (e) {
 		var k = e.which;
 		switch (k) {
-			case 121: //Y
+			case 121: //Y 
 				showHideChat();
+				break;
+			case 32:
+				showHideLeaderBoard(true);
+		}
+	}).keyup(function (e) {
+		var k = e.which;
+		switch (k) {
+			case 32:
+				showHideLeaderBoard(false);
 		}
 	});
 
@@ -166,6 +179,13 @@ function showHideChat() {
 	}
 	showChat = !showChat;
 	showChat ? $('#chat').show() : $('#chat').hide();
+}
+
+function showHideLeaderBoard(isShow) {
+	if (!joined) {
+		return;
+	}
+	isShow ? $('#leader-board').show() : $('#leader-board').hide();
 }
 
 function popUpMessage(msg) {
