@@ -54,7 +54,7 @@ class PhysicsWorld {
         // Starting position is shifted 70 pixels away from main body to avoid impulse
         var toAdd = Bodies.circle(x + dirNorm.x * 70, y + dirNorm.y * 70, r, {
             mass: m, label: pid,
-            force: setVectorScale(dirNorm, 0.2),
+            force: setVectorScale(dirNorm, 0.3),
             restitution: 0.5,
             friction: 0.001,
             frictionAir: 0.001
