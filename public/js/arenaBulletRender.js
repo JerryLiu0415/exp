@@ -1,5 +1,5 @@
 
-class Render_Bullet {
+class ArenaBulletRender {
     constructor(arenaId, bulletData) {
         this.$arena = $(arenaId);
         this.bulletData = bulletData;
@@ -8,7 +8,7 @@ class Render_Bullet {
 
     materialize() {
         // Body
-        this.$arena.append('<img id=' + this.bulletData.id + 'B' + ' class="tank">');
+        this.$arena.append('<img id=' + this.bulletData.id + 'B' + ' class="tail">');
         this.$body = $('#' + this.bulletData.id + 'B');
 
     }
@@ -18,7 +18,7 @@ class Render_Bullet {
         // Body
         this.$body.css('left', this.bulletData.x - 20 + 'px');
         this.$body.css('top', this.bulletData.y - 26 + 'px');
-        this.tailAnimation(this.bulletData.x, this.bulletData.y);
+        //this.tailAnimation(this.bulletData.x, this.bulletData.y);
     }
 
     tailAnimation(x, y) {

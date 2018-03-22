@@ -2,26 +2,28 @@ var express = require('express');
 var app = express();
 var PhysicsWorld = require('./physics.js');
 var GameServer = require('./gameServer.js');
+
+// Frequency at which the game is updated
 var INTERVAL = 10;
 
+// Express file server
 app.use(express.static(__dirname + '/public'));
-
-var server = app.listen(process.env.PORT || 5004, function () {
+var server = app.listen(process.env.PORT || 5005, function () {
 	var port = server.address().port;
 	console.log('Server running at port %s', port);
 });
 
+// Realtime communication with client
 var io = require('socket.io')(server);
 
-// All client sockets stored here, indexed by room id
+// All client sockets stored here, indexed by game id
 var clients = {};
 
-// All instances of games stored here, indexed by room id
+// All instances of games stored here, indexed by game id
 var games = {};
 
-/* Connection events */
 io.on('connection', function (client) {
-	console.log('User connected');
+	console.log('Connected');
 
 	/**
 	 *  Client will send the character position and mouse position to this route
@@ -62,10 +64,7 @@ io.on('connection', function (client) {
 		if (client_game == null || client_game.donuts[data.pid].cdQ != 0) {
 			return;
 		}
-		// Bullet object has id of the form: <owner id> + '-B-' + <ramdom id>
-		client_game.donuts[data.pid].cdQ = 100;
-		var bid = data.pid + '-B-' + UID();
-		client_game.addBullet(data.from.x, data.from.y, data.to.x, data.to.y, 1, bid);
+		client_game.castingQ(data);
 	});
 
 	/**

@@ -1,6 +1,6 @@
 // This IP is hardcoded to my server, replace with your own
 // 'https://oooppp.herokuapp.com'
-// 'http://localhost:5004'
+// 'http://localhost:5005'
 var socket = io.connect('https://oooppp.herokuapp.com');
 var render;
 var joined = false;
@@ -18,18 +18,22 @@ var config = {
 	type: 1,
 }
 
-// setInterval(function () {
-// 	if (joined) {
-// 		if (queue.length > 1) {
-// 			var data = queue.shift();
-// 			var localData = data[localRoomId];
-// 			if (localData == null) {
-// 				return;
-// 			}
-// 			render.refresh(localData);
+// function frame() {
+// 	var t = new Date().getTime();
+// 	if (joined && dataPrev != null) {
+// 		var localData = dataPrev[localRoomId];
+// 		if (localData == null) {
+// 			return;
 // 		}
+// 		render.refresh(localData);
+
 // 	}
-// }, 10);
+// 	console.log(t - timePrev);
+// 	timePrev = t;
+// 	requestAnimationFrame(frame); // request the next frame
+// }
+  
+// requestAnimationFrame(frame); // start the first frame
 
 socket.on('sync', function (data) {
 	if (joined) {
@@ -48,7 +52,7 @@ socket.on('joined', function (data) {
 	joined = true;
 	localRoomId = data.rid;
 	localPlayerId = data.pid;
-	render = new Render('#arena', localPlayerId, localRoomId, socket);
+	render = new ArenaRender('#arena', localPlayerId, localRoomId, socket, data.initData);
 	updateChat(data.initData.messages);
 	updateLeaderBoard(data.initData.donuts);
 	$('#button').show();
@@ -188,7 +192,7 @@ function showHideLeaderBoard(isShow) {
 	isShow ? $('#leader-board').show() : $('#leader-board').hide();
 }
 
-function popUpMessage(msg) {
+function popUpMessageGeneral(msg) {
 	$('body').append('<div id="game-prompt-dead" class="game-prompt-dead"><p>' + msg + '</p></div>');
 	$('#game-prompt-dead').fadeTo(3000, 0.1);
 	setTimeout(function () {

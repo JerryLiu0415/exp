@@ -25,7 +25,6 @@ World.add(engine.world, [boxA, boxB, ground]);
 
 console.log(engine.world.bodies);
 console.log(engine.world);
-
 // run the engine
 Engine.run(engine);
 

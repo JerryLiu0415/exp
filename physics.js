@@ -4,7 +4,10 @@ var Engine = Matter.Engine,
     World = Matter.World,
     Body = Matter.Body,
     Bodies = Matter.Bodies,
-    Events = Matter.Events;
+    Events = Matter.Events,
+    Constraint = Matter.Constraint,
+    Composite = Matter.Composite,
+    Composites = Matter.Composites;
 
 class PhysicsWorld {
 
@@ -44,22 +47,42 @@ class PhysicsWorld {
         Body.setAngle(body, alpha);
     }
 
-    addInitialBody(x, y, r, m, alpha, pid) {
+    addCharacterPhysBody(x, y, r, m, alpha, pid) {
         var toAdd = Bodies.circle(x, y, r, { mass: m, label: pid, force: { x: 0.2, y: 0.2 }, friction: 0, angle: alpha, restitution: 0.5 });
         World.add(this.engine.world, [toAdd]);
     }
 
-    addBulletBody(x, y, r, m, dir, pid) {
+    addBulletBody(x, y, r, m, dir, bid) {
         var dirNorm = vectorNormalize(dir);
         // Starting position is shifted 70 pixels away from main body to avoid impulse
         var toAdd = Bodies.circle(x + dirNorm.x * 70, y + dirNorm.y * 70, r, {
-            mass: m, label: pid,
+            mass: m, label: bid,
             force: setVectorScale(dirNorm, 0.3),
             restitution: 0.5,
             friction: 0.001,
             frictionAir: 0.001
         });
         World.add(this.engine.world, [toAdd]);
+    }
+
+    addBulletBody2(x, y, r, m, dir, bid, pid) {
+        var dirNorm = vectorNormalize(dir);
+        // Starting position is shifted 70 pixels away from main body to avoid impulse
+        var toAdd = Bodies.circle(x + dirNorm.x * 170, y + dirNorm.y * 170, r, {
+            mass: m, label: bid,
+            restitution: 0.5,
+            friction: 0.001,
+            frictionAir: 0.001
+        });
+
+        var body = this.getBody(pid);
+        var constraint = Constraint.create({
+            bodyA: body,
+            bodyB: toAdd,
+            stiffness: 0.01
+        });
+    
+        World.add(this.engine.world, [toAdd, constraint]);
     }
 
     getBody(pid) {
@@ -87,6 +110,20 @@ class PhysicsWorld {
 
     rotateTo(body, alpha) {
         Matter.Body.setAngle(body, alpha);
+    }
+
+    appendBody(pid) {
+        var body = this.getBody(pid);
+        var donutB = Bodies.circle(body.position.x + 50, body.position.y + 50, 20,
+            {
+                mass: 0.1, force: { x: 0, y: 0 }, angle: 0, restitution: 0.5
+            }
+        );
+        var base = Matter.Composite.create();
+        Matter.Composite.add(base, body);
+        var compositeBody = Matter.Composite.add(base, donutB);
+        var chain = Composites.chain(compositeBody, 0.5, 0, -0.5, 0, { stiffness: 1 });
+        World.add(this.engine.world, [chain]);
     }
 }
 

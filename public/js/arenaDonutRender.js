@@ -1,4 +1,4 @@
-class Render_Donut {
+class ArenaDonutRender {
     constructor(arenaId, donutData, isLocal) {
         this.timer = 0;
         this.$arena = $(arenaId);
@@ -11,9 +11,21 @@ class Render_Donut {
     materialize() {
         var color = parseInt(this.donutData.id) % 4;
         // Body
-        this.$arena.append('<img id=' + this.donutData.id + ' class="tank" src="img/testbase' + '_' + color + '.png">');
-        this.$body = $('#' + this.donutData.id);
+        switch (this.donutData.type) {
+            case 1:
+                this.$arena.append(
+                    '<img id=' + this.donutData.id + ' class="tank" src=' +
+                    DONUT_IMAGE_CLASSIC_PREFIX + color + DONUT_IMAGE_EXT + '>');
+                break;
+            case 2:
+                this.$arena.append(
+                    '<img id=' + this.donutData.id + ' class="tank" src=' +
+                    DONUT_IMAGE_SWORD_PREFIX + color + DONUT_IMAGE_EXT + '>');
+                break;
+        }
 
+        // Body initial rotation 
+        this.$body = $('#' + this.donutData.id);
         this.$body.css('-webkit-transform', 'rotateZ(' + this.donutData.angle + 'deg)');
         this.$body.css('-moz-transform', 'rotateZ(' + this.donutData.angle + 'deg)');
         this.$body.css('-o-transform', 'rotateZ(' + this.donutData.angle + 'deg)');
@@ -24,8 +36,6 @@ class Render_Donut {
         this.$info = $('#info-' + this.donutData.id);
         this.$info.append('<div class="label">' + this.donutData.name + '</div>');
         this.$info.append('<div class="hp-boarder"><div class="hp-bar"></div></div>');
-
-        console.log('<img id=' + this.donutData.id + ' class="tank" src="img/testbase' + '_' + color + '.png">');
     }
 
     refresh(donutData) {
@@ -63,6 +73,13 @@ class Render_Donut {
         this.$body.css('-o-transform', 'rotateZ(' + this.donutData.angle + 'deg)');
         this.$body.css('transform', 'rotateZ(' + this.donutData.angle + 'deg)');
 
+        // Parts
+        // tailAnimation
+        for (var i = 0; i < this.donutData.parts.length; i++) {
+            this.tailAnimation(this.donutData.parts[i].x, this.donutData.parts[i].y);
+        }
+
+
         // Info
         this.$info.css('left', ((this.donutData.x).toFixed(1) + 10) + 'px');
         this.$info.css('top', (this.donutData.y).toFixed(1) + 'px');
@@ -84,21 +101,23 @@ class Render_Donut {
         this.$body.fadeTo(200, 0.5);
         this.$body.fadeTo(200, 1);
     }
+
+    tailAnimation(x, y) {
+        var uid = UID();
+        this.$arena.append('<div id="' + uid + '" class="tail" style="left: ' + x + 'px; top: ' + y + 'px"></div>');
+        $('#' + uid).animate({
+            opacity: 0.05,
+            width: 40,
+            height: 40,
+            left: x - 20,
+            top: y - 20
+        }, 100);
+        setTimeout(function () {
+            $('#' + uid).remove();
+        }, 100)
+    }
 }
 
-function UID() {
-    var key1 = Math.floor(Math.random() * 1000).toString();
-    var key2 = Math.floor(Math.random() * 1000).toString();
-    var key3 = Math.floor(Math.random() * 1000).toString();
-    var key4 = Math.floor(Math.random() * 1000).toString();
-    return (key1 + key2 + key3 + key4);
-}
 
-function getGreenToRed(current, max) {
-    const percent = current / max;
-    r = current < 5 ? 255 : Math.floor(255 - (percent * 200.0 - 100) * 255 / 100);
-    g = current > 5 ? 255 : Math.floor((percent * 200.0) * 255 / 100);
-    return 'rgb(' + r + ',' + g + ',0)';
-}
 
 

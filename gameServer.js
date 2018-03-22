@@ -4,9 +4,8 @@ var staticData = require('./gameStaticData');
 // Game structure
 class GameServer {
     constructor(id, host) {
-        this.sockets =
-            // Physics Engine
-            this.phys = new PhysicsWorld(this);
+        // Physics Engine
+        this.phys = new PhysicsWorld(this);
 
         // Room id (Sent to user on 'join')
         this.rid = id;
@@ -54,9 +53,10 @@ class GameServer {
             cdW2: 0,
             dead: false,
             kill: 0,
-            invisible: false
+            invisible: false,
+            parts: [], // Keeping track of body parts positions
         };
-        this.phys.addInitialBody(x, y, staticData[type].RADIUS, staticData[type].MASS, 0, id);
+        this.phys.addCharacterPhysBody(x, y, staticData[type].RADIUS, staticData[type].MASS, 0, id);
     }
 
     /** 
@@ -110,6 +110,12 @@ class GameServer {
             this.donuts[key].x = body.position.x;
             this.donuts[key].y = body.position.y;
             this.donuts[key].angle = body.angle;
+            if (body.parts.length > 1) {
+                for (var i = 1; i < body.parts.length; i++) {
+                    this.donuts[key].parts[i - 1].x = body.parts[i - 1].position.x;
+                    this.donuts[key].parts[i - 1].y = body.parts[i - 1].position.y;
+                }
+            }
         }
 
         // Updating game objects (bullets) using the data from physics engine
@@ -208,6 +214,43 @@ class GameServer {
         }
     }
 
+    // Q event handler
+    castingQ(data) {
+        var x = data.from.x;
+        var y = data.from.y;
+        var toX = data.to.x;
+        var toY = data.to.y;
+        var pid = data.pid;
+
+        switch (this.donuts[data.pid].type) {
+            case 1:
+                this.donuts[data.pid].cdQ = 100;
+                // Bullet object has id of the form: <owner id> + '-B-' + <ramdom id>
+                var bid = data.pid + '-B-' + UID();
+                this.addBullet(data.from.x, data.from.y, data.to.x, data.to.y, 1, bid);
+                break;
+            case 2:
+                this.donuts[data.pid].cdQ = 100;
+                // Bullet object has id of the form: <owner id> + '-B-' + <ramdom id>
+                var bid = data.pid + '-B-' + UID();
+
+                this.bullets[bid] = {
+                    x: x,
+                    y: y,
+                    toX: toX,
+                    toY: toY,
+                    type: 2,
+                    id: bid
+                };
+                var direction = {
+                    x: toX - x,
+                    y: toY - y
+                };
+                this.phys.addBulletBody2(x, y, 25, 0.2, direction, bid, pid);
+                break;
+        }
+    }
+
     respawnDonut(pid, index) {
         const respawnPositions = [{ x: 10, y: 10 }, { x: 1000, y: 10 }, { x: 10, y: 10 }, { x: 1000, y: 400 }];
         var body = this.phys.getBody(pid);
@@ -242,12 +285,12 @@ class GameServer {
             if (pair.bodyA.label == "wall") {
                 if (pair.bodyB.label == "wall") {
                 } else if (pair.bodyB.label in this.bullets) {
-                    this.cleanBullet(pair.bodyB.label);
+                    // this.cleanBullet(pair.bodyB.label);
                 } else {
                 }
             } else if (pair.bodyA.label in this.bullets) {
                 if (pair.bodyB.label == "wall") {
-                    this.cleanBullet(pair.bodyA.label);
+                    // this.cleanBullet(pair.bodyA.label);
                 } else if (pair.bodyB.label in this.bullets) {
                 } else if (pair.bodyB.label in this.donuts) {
                     this.donuts[pair.bodyB.label].hp--;
@@ -279,3 +322,9 @@ class GameServer {
 }
 
 module.exports = GameServer;
+
+function UID() {
+    var key1 = Math.floor(Math.random() * 1000).toString();
+    var key2 = Math.floor(Math.random() * 1000).toString();
+    return (key1 + key2);
+}
